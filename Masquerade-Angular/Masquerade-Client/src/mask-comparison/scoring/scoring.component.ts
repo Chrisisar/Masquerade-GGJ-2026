@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
@@ -21,10 +21,13 @@ interface ScoringPlayer {
   styleUrl: './scoring.component.scss'
 })
 export class ScoringComponent implements OnInit {
-  players: ScoringPlayer[] = [];
-  currentPlayerId = 'player1'; // replace with real current player id from auth/service
-  navigating = false;
+  private router = inject(Router); // inject 
   
+  public players: ScoringPlayer[] = [];
+  public currentPlayerId = 'player1'; // replace with real current player id from auth/service
+  public navigating = false;
+
+
   get filteredPlayers(): ScoringPlayer[] {
     return this.players.filter(p => p.approved);
   }
@@ -33,7 +36,6 @@ export class ScoringComponent implements OnInit {
     return this.players.find(p => p.id === this.currentPlayerId)!;
   }
   
-  constructor(private router: Router) {}
 
   ngOnInit(): void {
     this.populateDemoPlayers();
