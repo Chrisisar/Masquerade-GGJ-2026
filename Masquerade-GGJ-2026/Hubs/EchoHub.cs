@@ -28,9 +28,7 @@ namespace Masquerade_GGJ_2026.Hubs
 
         public async Task SendMessage(string message)
         {
-            // odpowiedź po 15 sekundach tylko do nadawcy
-            await Task.Delay(15_000);
-            await Clients.Caller.SendAsync("ReceiveMessage", message);
+            await Clients.All.SendAsync("ReceiveMessage", message);
         }
     }
 }
