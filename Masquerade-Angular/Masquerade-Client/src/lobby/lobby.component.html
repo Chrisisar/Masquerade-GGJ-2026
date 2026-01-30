@@ -1,0 +1,66 @@
+<div class="lobby-container">
+  <!-- Header -->
+  <div class="lobby-header">
+    <h1>Masquerade - Lobby</h1>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="lobby-content">
+    <!-- Players Section -->
+    <div class="players-section">
+      <h2>Players</h2>
+      <div class="players-list">
+        <div class="player-item">
+          <span class="player-name">Player 1</span>
+          <span class="player-role">Role 1</span>
+          <span class="ready-status ready">✓ Ready</span>
+        </div>
+        <div class="player-item">
+          <span class="player-name">Player 2</span>
+          <span class="player-role">Role 2</span>
+          <span class="ready-status waiting">⏳ Waiting</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Section -->
+    <div class="settings-section">
+      <h3>Settings</h3>
+      <div class="settings-group">
+        <label>
+          <input type="checkbox" name="setting1" />
+          Enable Chat
+        </label>
+        <label>
+          <input type="checkbox" name="setting2" />
+          Enable Timer
+        </label>
+        <label>
+          <input type="checkbox" name="setting3" />
+          Auto-start when ready
+        </label>
+      </div>
+    </div>
+
+    <!-- Chat Section -->
+    <div class="chat-section">
+      <h3>Chat</h3>
+      <div class="chat-messages">
+        <div class="chat-message">
+          <span class="chat-player">Player 1:</span>
+          <span class="chat-text">Let's start!</span>
+        </div>
+      </div>
+      <div class="chat-input-area">
+        <input type="text" placeholder="Type a message..." />
+        <button>Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer / Actions -->
+  <div class="lobby-footer">
+    <button class="btn btn-ready">Ready</button>
+    <button class="btn btn-leave">Leave Game</button>
+  </div>
+</div>
