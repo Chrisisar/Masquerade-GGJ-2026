@@ -4,6 +4,7 @@ namespace Masquerade_GGJ_2026.Hubs
     using System;
     using System.Threading.Tasks;
 
+    public class EchoHub : Hub
     {
         public override async Task OnConnectedAsync()
         {
@@ -12,6 +13,7 @@ namespace Masquerade_GGJ_2026.Hubs
             if (!string.IsNullOrEmpty(username))
             {
                 Context.Items["username"] = username;
+                log.LogInformation("User connected: {Username}, ConnectionId: {ConnectionId}", username, Context.ConnectionId);
             }
 
             await Clients.All.SendAsync("UserJoined", Context.ConnectionId, username);
@@ -21,6 +23,7 @@ namespace Masquerade_GGJ_2026.Hubs
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
             var username = Context.Items.ContainsKey("username") ? Context.Items["username"]?.ToString() : null;
+            log.LogInformation("User disconnected: {Username}, ConnectionId: {ConnectionId}", username, Context.ConnectionId);
             await Clients.All.SendAsync("UserLeft", Context.ConnectionId, username);
             await base.OnDisconnectedAsync(exception);
         }
@@ -29,6 +32,7 @@ namespace Masquerade_GGJ_2026.Hubs
         {
             // odpowiedź po 15 sekundach tylko do nadawcy
             await Task.Delay(15_000);
+            await Clients.Caller.SendAsync("ReceiveMessage", message);
         }
     }
 }
