@@ -57,26 +57,6 @@ export class MaskComparisonComponent implements OnInit {
   }
 
   private loadPlayerMasks(): void {
-    // Try loading masks saved in localStorage (saved by mask-creator)
-    // try {
-    //   const stored = JSON.parse(localStorage.getItem('masquerade_masks') || '[]');
-    //   if (Array.isArray(stored) && stored.length > 0) {
-    //     this.playerMasks = stored.map((m: any) => ({
-    //       id: m.id,
-    //       playerName: m.playerName || 'Player',
-    //       playerRole: m.playerRole || 'Mask Maker',
-    //       imageData: m.imageData
-    //     } as PlayerMask));
-    //   } else {
-    //     this.playerMasks = [];
-    //   }
-    // } catch (e) {
-    //   console.warn('Could not read masks from localStorage', e);
-    //   this.playerMasks = [];
-    // }
-
-    // Ensure we have placeholders for other players if needed
-    // Generate a base64 SVG heart placeholder at runtime (fallback to 1x1 PNG if btoa isn't available)
     let placeholder = '';
     try {
       const heartSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#e74c3c" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
@@ -93,8 +73,13 @@ export class MaskComparisonComponent implements OnInit {
         playerRole: 'Role 1',
         imageData: m.encodedMask
         });
-      }
-    );
+      this.votingPlayers().push({
+        id: m.player.connectionId,
+        name: m.player.username,
+        role: 'Role 1',
+        hasVoted: m.player.isReady  
+        });
+    });
   }
 
   selectMask(maskId: string): void {
