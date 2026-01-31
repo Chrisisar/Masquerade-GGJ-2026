@@ -9,7 +9,9 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:4200")
+        string[] allowedOrigins = new string[] { "http://localhost:4200", "https://gatecrusher.mufinek.pl", "https://maska.mufinek.pl" };
+        foreach(var domain in allowedOrigins)
+        policy.WithOrigins(domain)
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
