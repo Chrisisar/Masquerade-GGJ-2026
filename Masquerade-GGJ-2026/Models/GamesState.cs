@@ -2,6 +2,6 @@
 {
     public static class GamesState
     {
-        public static List<Game> Games { get; } = new() { new Game() };
+        public static List<Game> Games { get; } = new();
     }
 }

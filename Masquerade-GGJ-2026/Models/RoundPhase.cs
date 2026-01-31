@@ -2,9 +2,15 @@
 {
     public enum RoundPhase
     {
-        Lobby,
-        Drawing,
-        Voting,
-        Scoreboard
+        Lobby = 0,
+        Drawing = 1,
+        Voting = 2,
+        Scoreboard= 3,
+        Ballroom = 4,
+        UserSelect = 5,
+
+        CutsceneOpening = 100,
+        CutsceneMakeTheMask = 101,
+        CutsceneTheChoice = 102
     }
 }

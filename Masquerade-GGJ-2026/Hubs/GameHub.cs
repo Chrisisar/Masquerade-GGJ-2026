@@ -121,8 +121,8 @@ namespace Masquerade_GGJ_2026.Hubs
                 GameName = string.IsNullOrWhiteSpace(gameName) ? $"Room {Guid.NewGuid()}" : gameName
             };
             GamesState.Games.Add(newGame);
-
-            await GetAllGameIds();
+            await _orchestrator.EndPhase(newGame, "New Game");
+            //await GetAllGameIds();
             //Join the newly created game
             await JoinGame(newGame.GameId.ToString());
             return newGame.GameId.ToString();

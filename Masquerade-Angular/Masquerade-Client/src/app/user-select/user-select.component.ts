@@ -19,7 +19,7 @@ export class UserSelectComponent {
 
   rooms = signal<GameRoom[]>([]);
   userName = '';
-  connected = false;
+  connected = signal(false);
   newRoomName = '';
   errorMessage = signal<string | null>(null);
 
@@ -37,10 +37,10 @@ export class UserSelectComponent {
 
     this.svc.connect(this.userName).then((success) => {
       if(success) {
+        this.connected.set(true);
         this.errorMessage.set(null);
         console.log(this.userName + ' connected to the game hub.', success);
         this.svc.getAvailableGameRooms().finally();
-        this.connected = true;
       }else{
         this.errorMessage.set('Error connecting to server.');
       }
@@ -51,7 +51,7 @@ export class UserSelectComponent {
   }
 
   disconnect() {
-    this.connected = false;
+    this.connected.set(false);
 
     this.errorMessage.set(null);
 
@@ -83,7 +83,7 @@ export class UserSelectComponent {
 
   reset() {
     this.userName = '';
-    this.connected = false;
+    this.connected.set(false);
     this.errorMessage.set(null);
 
     // odsubskrybuj też przy resecie

@@ -40,19 +40,21 @@ export class LobbyComponent implements OnInit {
         this.appState.setState(phase as GameState, message);
       }, 800)
     );
+
+    this.appState.lobbyMessageSignal().players.forEach((p: any) => {
+        this.players().push({
+          id: p.connectionId,
+          name: p.username,
+          role: 'Role 1',
+          ready: p.isReady,
+        });
+      }
+    );
   }
 
   toggleReady(): void {
     this.svc.ready();
   }
-
-  // get allPlayersReady(): boolean {
-  //   return this.players().length > 0 && this.players().every(p => p.ready);
-  // }
-
-  // get readyCount(): number {
-  //   return this.players().filter(p => p.ready).length;
-  // }
 
   leaveGame(): void {
     this.svc.leaveGame();

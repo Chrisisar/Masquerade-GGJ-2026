@@ -10,15 +10,40 @@
 
         public PhaseDetails(int drawingTimeSeconds, int votingTimeSeconds)
         {
-            CurrentPhase = RoundPhase.Lobby;
+            CurrentPhase = RoundPhase.UserSelect;
             DrawingTimeSeconds = drawingTimeSeconds;
             VotingTimeSeconds = votingTimeSeconds;
         }
 
         public void NextPhase()
         {
-            var newPhase = (int)(CurrentPhase + 1) % 4;
-            CurrentPhase = (RoundPhase)newPhase;
+            switch(CurrentPhase)
+            {
+                case RoundPhase.UserSelect:
+                    CurrentPhase = RoundPhase.Lobby;
+                    break;
+                case RoundPhase.Lobby:
+                    CurrentPhase = RoundPhase.CutsceneOpening;
+                    break;
+                case RoundPhase.CutsceneOpening:
+                    CurrentPhase = RoundPhase.Drawing;
+                    break;
+                case RoundPhase.Drawing:
+                    CurrentPhase = RoundPhase.CutsceneMakeTheMask;
+                    break;
+                case RoundPhase.CutsceneMakeTheMask:
+                    CurrentPhase = RoundPhase.Voting;
+                    break;
+                case RoundPhase.Voting:
+                    CurrentPhase = RoundPhase.CutsceneTheChoice;
+                    break;
+                case RoundPhase.CutsceneTheChoice:
+                    CurrentPhase = RoundPhase.Scoreboard;
+                    break;
+                case RoundPhase.Scoreboard:
+                    CurrentPhase = RoundPhase.Lobby;
+                    break;
+            }
         }
     }
 }
