@@ -6,7 +6,7 @@ import { SignalrService } from './signalr.service';
   providedIn: 'root'
 })
 export class AppStateService {
-  private currentStateSignal = signal<GameState>(GameState.USER_SELECT);
+  private currentStateSignal = signal<GameState>(GameState.MASK_DRAW);
   private signalrService = inject(SignalrService);
 
   //Messages
