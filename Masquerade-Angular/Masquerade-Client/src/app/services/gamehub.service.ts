@@ -19,7 +19,7 @@ export class GameHubService {
   private receivePhaseChanged$ = new Subject<[GameState, any]>();
   public playerId: string = '';
   public playerName: string = '';
-  private gameId: string = '';
+  public gameId: string = '';
 
   onReceiveMessage(): Observable<string> {
     return this.receiveMessage$.asObservable();
