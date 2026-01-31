@@ -60,6 +60,6 @@
   <!-- Footer / Actions -->
   <div class="lobby-footer">
     <button class="btn btn-ready" (click)="toggleReady()" [disabled]="currentPlayerReady">{{ currentPlayerReady ? 'You are Ready!' : 'Ready' }}</button>
-    <button class="btn btn-leave" (click)="leaveGame()">Leave Game</button>
+    <button class="btn btn-leave" (click)="leaveGame()" [disabled]>Leave Game</button>
   </div>
 </div>

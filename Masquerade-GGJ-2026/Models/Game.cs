@@ -3,7 +3,7 @@
     public class Game
     {
         public Guid GameId { get; set; } = Guid.NewGuid();
-        public List<Player> Players { get; set; }
+        public List<PlayerGameState> Players { get; set; }
         public PhaseDetails PhaseDetails { get; set; }
         public List<string> AllMaskRequirements { get; set; }
         public int TotalNumberOfRequirements { get; set; } = 6;
@@ -13,7 +13,7 @@
         public Game()
         {
             PhaseDetails = new PhaseDetails(drawingTimeSeconds: 60, votingTimeSeconds: 30);
-            Players = new List<Player>();
+            Players = new List<PlayerGameState>();
             AllMaskRequirements = new List<string>();
         }
     }

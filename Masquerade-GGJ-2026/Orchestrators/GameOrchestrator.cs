@@ -62,7 +62,7 @@ namespace Masquerade_GGJ_2026.Orchestrators
             phaseDetails.PhaseCts = new CancellationTokenSource();
 
             phaseDetails.NextPhase();
-            game.Players.ForEach(p => p.IsReady = false);
+            game.Players.ForEach(p => p.Player.IsReady = false);
 
             switch (phaseDetails.CurrentPhase)
             {
@@ -99,16 +99,16 @@ namespace Masquerade_GGJ_2026.Orchestrators
             {
                 if (player != badPlayer)
                 {
-                    if (player.VotedPlayerId == badPlayer.ConnectionId)
+                    if (player.VotedPlayerId == badPlayer.Player.ConnectionId)
                     {
                         player.Score += 5;
                     }
-                    if (badPlayer.ConnectionId == kickedPlayerId)
+                    if (badPlayer.Player.ConnectionId == kickedPlayerId)
                     {
                         player.Score += 5;
                     }
                 }
-                if (player == badPlayer && kickedPlayerId != badPlayer.ConnectionId)
+                if (player == badPlayer && kickedPlayerId != badPlayer.Player.ConnectionId)
                 {
                     badPlayer.Score += 20;
                 }

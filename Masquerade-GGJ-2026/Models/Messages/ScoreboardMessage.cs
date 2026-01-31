@@ -4,6 +4,6 @@
 
     public class ScoreboardMessage
     {
-        public List<Player> Players { get; set; } = new();
+        public List<PlayerGameState> Players { get; set; } = new();
     }
 }

@@ -50,7 +50,7 @@ namespace Masquerade_GGJ_2026.Orchestrators
                         foreach (var player in game.Players)
                         {
                             player.IsEvil = player == badPlayer;
-                            await _hub.Clients.Client(player.ConnectionId).SendAsync("PhaseChanged", game.PhaseDetails.CurrentPhase, CreateDrawingMessage(game, player.IsEvil));
+                            await _hub.Clients.Client(player.Player.ConnectionId).SendAsync("PhaseChanged", game.PhaseDetails.CurrentPhase, CreateDrawingMessage(game, player.IsEvil));
                         }
                         break;
                     case RoundPhase.Voting:
@@ -82,7 +82,7 @@ namespace Masquerade_GGJ_2026.Orchestrators
         {
             return new VotingMessage
             {
-                Masks = game.Players.Select(p => new UserMask { UserName = p.Username ?? "", EncodedMask = p.EncodedMask ?? "" }).ToList(),
+                Masks = game.Players.Select(p => new UserMask { Player = p.Player, EncodedMask = p.EncodedMask ?? "" }).ToList(),
                 PhaseEndsAt = game.PhaseDetails.PhaseEndsAt!.Value,
             };
         }
@@ -113,7 +113,7 @@ namespace Masquerade_GGJ_2026.Orchestrators
         {
             return new LobbyMessage
             {
-                Players = game.Players
+                Players = game.Players.Select(p => p.Player).ToList()
             };
         }
 
@@ -129,6 +129,11 @@ namespace Masquerade_GGJ_2026.Orchestrators
             {
                 PhaseDetails = game.PhaseDetails,
             });
+        }
+
+        public async Task SendPlayersInRoom(Game game)
+        {
+            await _hub.Clients.Group(game.GameId.ToString()).SendAsync("PlayersInTheRoom", game.Players.Select(p => p.Player).ToList());
         }
     }
 }
