@@ -2,9 +2,3 @@
 /dist
 /.angular
 .env
-.idea/
-**/obj/
-**/bin/
-**/.vs
-**/Debug
-.vs
