@@ -124,17 +124,14 @@ namespace Masquerade_GGJ_2026.Orchestrators
             await _hub.Clients.Group(game.GameId.ToString()).SendAsync("PlayerIsReady", player.ConnectionId, player.IsReady);
         }
 
-        public async Task UpdateGameState(Game game)
-        {
-            await _hub.Clients.Group(game.GameId.ToString()).SendAsync("GameStateUpdated", new
-            {
-                PhaseDetails = game.PhaseDetails,
-            });
-        }
-
         public async Task SendPlayersInRoom(Game game)
         {
             await _hub.Clients.Group(game.GameId.ToString()).SendAsync("PlayersInTheRoom", game.Players.Select(p => p.Player).ToList());
+        }
+
+        public async Task SendExceptionMessage(Game game, string message, string stackTrace)
+        {
+            await _hub.Clients.Group(game.GameId.ToString()).SendAsync("ExceptionMessage", message, stackTrace);
         }
     }
 }

@@ -81,6 +81,10 @@ export class GameHubService {
       this.receivePhaseChanged$.next([phase, message]);
     });
 
+    this.connection.on('ExceptionMessage', (message: string, stackTrace: string) => {
+      console.warn('ExceptionMessage:', message, stackTrace);
+    });
+
     try{
     await this.connection.start();
     } catch (error) {
