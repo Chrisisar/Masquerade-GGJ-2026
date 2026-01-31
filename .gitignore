@@ -3,6 +3,6 @@
 /.angular
 .env
 .idea/
-**/obj/
+**/obj/*
 **/bin/
 **/.vs
