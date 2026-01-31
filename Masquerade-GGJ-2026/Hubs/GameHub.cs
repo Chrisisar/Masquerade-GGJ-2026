@@ -28,6 +28,7 @@ namespace Masquerade_GGJ_2026.Hubs
             if (!string.IsNullOrEmpty(username))
             {
                 Context.Items["username"] = username;
+                await Clients.Caller.SendAsync("PlayerState", username, Context.ConnectionId);
                 _log.LogInformation("User connected to GameHub: {Username}, ConnectionId: {ConnectionId}", username, Context.ConnectionId);
             }
 
