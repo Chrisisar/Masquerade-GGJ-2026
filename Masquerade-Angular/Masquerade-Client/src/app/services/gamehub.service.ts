@@ -16,9 +16,9 @@ export class GameHubService {
   private connection?: HubConnection;
   private receiveMessage$ = new Subject<string>();
   private receivePlayersInTheRoom$ = new Subject<UserEvent[]>();
+  private receivePhaseChanged$ = new Subject<[GameState, any]>();
   public playerId: string = '';
   public playerName: string = '';
-  private receivePhaseChanged$ = new Subject<[GameState, any]>();
   private gameId: string = '';
 
   onReceiveMessage(): Observable<string> {
