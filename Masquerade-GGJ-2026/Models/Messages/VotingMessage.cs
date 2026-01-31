@@ -4,7 +4,7 @@ namespace Masquerade_GGJ_2026.Models.Messages
 
     public class UserMask
     {
-        public string UserName { get; set; } = string.Empty;
+        public Player Player { get; set; }
         public string EncodedMask { get; set; } = string.Empty;
     }
 

@@ -8,7 +8,7 @@ import { GameHubService } from '../services/gamehub.service';
 
 interface Player {
   id: string;
-  name: string;
+  name?: string | null;
   role: string;
   ready: boolean;
 }
@@ -31,46 +31,36 @@ export class LobbyComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.svc.connect(this.currentPlayerId);   
-    this.svc.onReceivePlayersInTheRoom().subscribe(msg => 
-      this.players.set(msg.map((name, i) => ({ id: `player${i}`, name, role: 'Mask Maker', ready: false }))
-    ));
-    // use getAllGameIds method from GameHubService to find all game ids
-    this.svc.getAllGameIds();
-    //this.initializePlayers();
-    
+    this.svc.connect(this.currentPlayerId).then(() => {
+      this.svc.onReceivePlayersInTheRoom().subscribe(msg => 
+        this.players.set(msg.map((player, i) => ({ id: player.connectionId, name: player.username, role: 'Mask Maker', ready: player.isReady }))
+      ));
+      this.svc.onReceivePhaseEnded().subscribe(phase => {
+        if (phase === 0) {
+          setTimeout(() => {
+            this.appState.setState(GameState.MASK_DRAW);
+          }, 800);
+        }}
+      );  
+      this.svc.getAllGameIds();  
+    });
   }
-
-  private joinMainGameRoom(): void {
-
-  }
-
 
   toggleReady(): void {
-    const currentPlayer = this.players().find(p => p.id === this.currentPlayerId);
-    if (currentPlayer) {
-      currentPlayer.ready = !currentPlayer.ready;
-      this.currentPlayerReady = currentPlayer.ready;
-    }
+    this.svc.ready();
 
-    // If all players are ready, navigate to mask creator
-    if (this.allPlayersReady) {
-      setTimeout(() => {
-        this.appState.setState(GameState.MASK_DRAW);
-      }, 800);
-    }
   }
 
-  get allPlayersReady(): boolean {
-    return this.players().length > 0 && this.players().every(p => p.ready);
-  }
+  // get allPlayersReady(): boolean {
+  //   return this.players().length > 0 && this.players().every(p => p.ready);
+  // }
 
-  get readyCount(): number {
-    return this.players().filter(p => p.ready).length;
-  }
+  // get readyCount(): number {
+  //   return this.players().filter(p => p.ready).length;
+  // }
 
   leaveGame(): void {
-    // TODO: Handle leaving game
+    this.svc.leaveGame();
     console.log('Player left the game');
   }
 

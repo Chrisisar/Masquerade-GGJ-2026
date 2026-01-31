@@ -6,6 +6,7 @@ import { Subject, Observable } from 'rxjs';
 export interface UserEvent {
   connectionId: string;
   username?: string | null;
+  isReady: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -13,26 +14,21 @@ export class GameHubService {
   private baseUrl = 'https://localhost:44330';
   private username = 'Player';
   private connection?: HubConnection;
-  private userJoined$ = new Subject<UserEvent>();
-  private userLeft$ = new Subject<UserEvent>();
   private receiveMessage$ = new Subject<string>();
-  private receivePlayersInTheRoom$ = new Subject<string[]>();
+  private receivePlayersInTheRoom$ = new Subject<UserEvent[]>();
+  private receivePhaseEnded$ = new Subject<number>();
   private gameId: string = '';
-
-  onUserJoined(): Observable<UserEvent> {
-    return this.userJoined$.asObservable();
-  }
-
-  onUserLeft(): Observable<UserEvent> {
-    return this.userLeft$.asObservable();
-  }
 
   onReceiveMessage(): Observable<string> {
     return this.receiveMessage$.asObservable();
   }
 
-  onReceivePlayersInTheRoom(): Observable<string[]> {
+  onReceivePlayersInTheRoom(): Observable<UserEvent[]> {
     return this.receivePlayersInTheRoom$.asObservable();
+  }
+
+  onReceivePhaseEnded(): Observable<number> {
+    return this.receivePhaseEnded$.asObservable();
   }
 
   async connect(username: string): Promise<void> {
@@ -48,14 +44,6 @@ export class GameHubService {
       .configureLogging(LogLevel.Information)
       .build();
 
-    this.connection.on('UserJoined', (connectionId: string, name?: string) => {
-      this.userJoined$.next({ connectionId, username: name });
-    });
-
-    this.connection.on('UserLeft', (connectionId: string, name?: string) => {
-      this.userLeft$.next({ connectionId, username: name });
-    });
-
     this.connection.on('ReceiveMessage', (message: string) => {
       this.receiveMessage$.next(message);
     });
@@ -68,8 +56,12 @@ export class GameHubService {
       }
     });
     
-    this.connection.on('PlayersInTheRoom', (userNames: string[]) => {
-      this.receivePlayersInTheRoom$.next(userNames);
+    this.connection.on('PlayersInTheRoom', (players: UserEvent[]) => {
+      this.receivePlayersInTheRoom$.next(players);
+    });
+    
+    this.connection.on('PhaseEnded', (phase: number) => {
+      this.receivePhaseEnded$.next(phase);
     });
 
     await this.connection.start();
@@ -93,5 +85,15 @@ export class GameHubService {
   async joinGame() {
     if (!this.connection) throw new Error('Not connected');
     await this.connection.invoke('JoinGame', this.gameId);
+  }
+
+  async leaveGame() {
+    if (!this.connection) throw new Error('Not connected');
+    await this.connection.invoke('LeaveGame');
+  }
+
+  async ready() {
+    if (!this.connection) throw new Error('Not connected');
+    await this.connection.invoke('PlayerReady');
   }
 }

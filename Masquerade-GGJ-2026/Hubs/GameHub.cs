@@ -47,8 +47,13 @@ namespace Masquerade_GGJ_2026.Hubs
             if (Context.Items.ContainsKey("gameId"))
             {
                 var gameId = Context.Items["gameId"]?.ToString();
-                if (!string.IsNullOrEmpty(gameId))
+                if (Guid.TryParse(gameId, out Guid gameIdGuid))
                 {
+                    var game = GamesState.Games.FirstOrDefault(x => x.GameId == gameIdGuid);
+                    if(game != null)
+                    {
+                        game.Players.RemoveAll(p => p.Player.ConnectionId == Context.ConnectionId);
+                    }
                     await _notifier.UserLeft(gameId, Context.ConnectionId, username);
                 }
             }
@@ -96,8 +101,8 @@ namespace Masquerade_GGJ_2026.Hubs
 
             await _notifier.UserJoined(gameId!, Context.ConnectionId, username);
 
-            game.Players.Add(new Player { ConnectionId = Context.ConnectionId, Username = username });
-            await Clients.Caller.SendAsync("PlayersInTheRoom", game.Players.Select(p => p.Username).ToList());
+            game.Players.Add(new PlayerGameState { Player = new Player { ConnectionId = Context.ConnectionId, Username = username } });
+            await _notifier.SendPlayersInRoom(game);
         }
 
         /// <summary>
@@ -120,7 +125,8 @@ namespace Masquerade_GGJ_2026.Hubs
             var game = GamesState.Games.FirstOrDefault(g => g.GameId == gameIdGuid);
             if (game != null)
             {
-                game.Players.RemoveAll(p => p.ConnectionId == Context.ConnectionId);
+                game.Players.RemoveAll(p => p.Player.ConnectionId == Context.ConnectionId);
+                await _notifier.SendPlayersInRoom(game);
             }
         }
 
@@ -134,14 +140,15 @@ namespace Masquerade_GGJ_2026.Hubs
             var game = GamesState.Games.FirstOrDefault(g => g.GameId == gameIdGuid);
             if (game != null)
             {
-                var player = game.Players.FirstOrDefault(p => p.ConnectionId == Context.ConnectionId);
+                var player = game.Players.FirstOrDefault(p => p.Player.ConnectionId == Context.ConnectionId).Player;
                 if (player != null)
                 {
                     player.IsReady = !player.IsReady;
                     await _notifier.PlayerReady(game, player);
+                    await _notifier.SendPlayersInRoom(game);
                     _log.LogInformation("Player {Username} in Game {GameId} is ready", player.Username, gameIdGuid);
                     // Check if all players are ready
-                    if (game.Players.All(p => p.IsReady))
+                    if (game.Players.All(p => p.Player.IsReady))
                     {
                         _log.LogInformation("All players in Game {GameId} are ready. Advancing phase.", gameIdGuid);
                         await _orchestrator.EndPhase(game, "All players ready");
@@ -160,11 +167,11 @@ namespace Masquerade_GGJ_2026.Hubs
             var game = GamesState.Games.FirstOrDefault(g => g.GameId == gameIdGuid);
             if (game != null)
             {
-                var player = game.Players.FirstOrDefault(p => p.ConnectionId == Context.ConnectionId);
+                var player = game.Players.FirstOrDefault(p => p.Player.ConnectionId == Context.ConnectionId);
                 if (player != null)
                 {
                     player.VotedPlayerId = selectedPlayerId;
-                    _log.LogInformation("Player {Username} in Game {GameId} casted vote", player.Username, gameIdGuid);
+                    _log.LogInformation("Player {Username} in Game {GameId} casted vote", player.Player.Username, gameIdGuid);
                     // Check if all players have submitted their drawings
                 }
             }
