@@ -6,6 +6,7 @@ namespace Masquerade_GGJ_2026.Orchestrators
     public static class GameOrchestrator
     {
         public static Random random = new Random();
+        public static List<Game> Games = new() { new Game() };
 
         public static ScoreboardMessage CreateScoreboardMessage(Game game)
         {

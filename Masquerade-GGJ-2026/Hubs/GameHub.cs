@@ -1,7 +1,6 @@
 namespace Masquerade_GGJ_2026.Hubs
 {
     using Masquerade_GGJ_2026.Models;
-    using Masquerade_GGJ_2026.Models.Messages;
     using Masquerade_GGJ_2026.Orchestrators;
     using Microsoft.AspNetCore.SignalR;
     using Microsoft.Extensions.Logging;
@@ -12,8 +11,6 @@ namespace Masquerade_GGJ_2026.Hubs
 
     public class GameHub(ILogger<GameHub> log) : Hub
     {
-        static List<Game> Games = new() { new Game() };
-
         public override async Task OnConnectedAsync()
         {
             var httpContext = Context.GetHttpContext();
@@ -51,6 +48,13 @@ namespace Masquerade_GGJ_2026.Hubs
             await base.OnDisconnectedAsync(exception);
         }
 
+        // Broadcast all game ids to the connected clients
+        public async Task GetAllGameIds()
+        {
+            var gameIds = GameOrchestrator.Games.Select(g => g.GameId.ToString()).ToList();
+            await Clients.Caller.SendAsync("ReceiveAllGameIds", gameIds);
+        }
+
         /// <summary>
         /// Allows a connected client to join a specific game by id.
         /// Adds the connection to the group, stores the gameId in Context.Items,
@@ -59,16 +63,23 @@ namespace Masquerade_GGJ_2026.Hubs
         public async Task JoinGame(string gameId)
         {
             //Already in a different game
-            if(Context.Items["gameId"] == null)
+            if(Context.Items["gameId"] != null)
             {
                 return;
             }
 
             //Invalid gameId
-            if (Guid.TryParse(gameId, out Guid gameIdGuid))
+            if (!Guid.TryParse(gameId, out Guid gameIdGuid))
             {
                 return;
             }
+
+            var game = GameOrchestrator.Games.FirstOrDefault(g => g.GameId == gameIdGuid);
+            if (game == null || game.CurrentPhase != RoundPhase.Lobby)
+            {
+                return;
+            }
+            
 
             var username = Context.Items.ContainsKey("username") ? Context.Items["username"]?.ToString() : null;
             Context.Items["gameId"] = gameIdGuid;
@@ -77,12 +88,7 @@ namespace Masquerade_GGJ_2026.Hubs
 
             await Clients.Group(gameId).SendAsync("UserJoinedGameGroup", Context.ConnectionId, username, gameIdGuid);
 
-            // Send current game state to the caller if available
-            var game = Games.FirstOrDefault(g => g.GameId == gameIdGuid);
-            if (game != null)
-            {
-                game.Players.Add(new Player { ConnectionId = Context.ConnectionId, Username = username });
-            }
+            game.Players.Add(new Player { ConnectionId = Context.ConnectionId, Username = username });
         }
 
         /// <summary>
@@ -107,7 +113,7 @@ namespace Masquerade_GGJ_2026.Hubs
             log.LogInformation("Connection {ConnectionId} left game group {GameId} via LeaveGame", Context.ConnectionId, gameId);
 
             // Send current game state to the caller if available
-            var game = Games.FirstOrDefault(g => g.GameId == gameIdGuid);
+            var game = GameOrchestrator.Games.FirstOrDefault(g => g.GameId == gameIdGuid);
             if (game != null)
             {
                 game.Players.RemoveAll(p => p.ConnectionId == Context.ConnectionId);
@@ -121,7 +127,7 @@ namespace Masquerade_GGJ_2026.Hubs
             {
                 return;
             }
-            var game = Games.FirstOrDefault(g => g.GameId == gameIdGuid);
+            var game = GameOrchestrator.Games.FirstOrDefault(g => g.GameId == gameIdGuid);
             if (game != null)
             {
                 var player = game.Players.FirstOrDefault(p => p.ConnectionId == Context.ConnectionId);
@@ -141,7 +147,7 @@ namespace Masquerade_GGJ_2026.Hubs
 
         public async Task PhaseChanged(Guid gameId)
         {
-            var game = Games.FirstOrDefault(g => g.GameId == gameId);
+            var game = GameOrchestrator.Games.FirstOrDefault(g => g.GameId == gameId);
             if (game != null)
             {
                 var newPhase = (int)(game.CurrentPhase + 1) % 4;
@@ -155,6 +161,7 @@ namespace Masquerade_GGJ_2026.Hubs
                         await Clients.Group(gameId.ToString()).SendAsync("PhaseChanged", game.CurrentPhase, GameOrchestrator.CreateLobbyMessage(game));
                         break;
                     case RoundPhase.Drawing:
+                        GameOrchestrator.GenerateNewMaskRequirements(game);
                         var badPlayer = game.Players[new Random().Next(game.Players.Count)];
                         foreach(var player in game.Players)
                         {
