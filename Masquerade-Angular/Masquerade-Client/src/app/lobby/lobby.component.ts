@@ -1,7 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, inject, Inject, OnInit, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AppStateService } from '../services/app-state.service';
 import { GameState } from '../types/game-state.enum';
+import { RouterOutlet } from '@angular/router';
+import { GameHubService } from '../services/gamehub.service';
 
 interface Player {
   id: string;
@@ -18,26 +21,33 @@ interface Player {
   styleUrl: './lobby.component.scss',
 })
 export class LobbyComponent implements OnInit {
-  players: Player[] = [];
+  public players = signal<Player[]>([]);
   currentPlayerId = 'player1';
   currentPlayerReady = false;
   private appState = inject(AppStateService);
+  private svc = inject(GameHubService);
+
+  constructor(private router: Router) { 
+  }
 
   ngOnInit(): void {
-    this.initializePlayers();
+    this.svc.connect(this.currentPlayerId);   
+    this.svc.onReceivePlayersInTheRoom().subscribe(msg => 
+      this.players.set(msg.map((name, i) => ({ id: `player${i}`, name, role: 'Mask Maker', ready: false }))
+    ));
+    // use getAllGameIds method from GameHubService to find all game ids
+    this.svc.getAllGameIds();
+    //this.initializePlayers();
+    
   }
 
-  private initializePlayers(): void {
-    // Initialize players - Player 2 is already ready, waiting for Player 1
-    this.players = [
-      { id: 'player1', name: 'You (Player 1)', role: 'Mask Maker', ready: false },
-      { id: 'player2', name: 'Player 2', role: 'Mask Maker', ready: true },
-      { id: 'player3', name: 'Player 3', role: 'Mask Maker', ready: true }
-    ];
+  private joinMainGameRoom(): void {
+
   }
+
 
   toggleReady(): void {
-    const currentPlayer = this.players.find(p => p.id === this.currentPlayerId);
+    const currentPlayer = this.players().find(p => p.id === this.currentPlayerId);
     if (currentPlayer) {
       currentPlayer.ready = !currentPlayer.ready;
       this.currentPlayerReady = currentPlayer.ready;
@@ -52,11 +62,11 @@ export class LobbyComponent implements OnInit {
   }
 
   get allPlayersReady(): boolean {
-    return this.players.length > 0 && this.players.every(p => p.ready);
+    return this.players().length > 0 && this.players().every(p => p.ready);
   }
 
   get readyCount(): number {
-    return this.players.filter(p => p.ready).length;
+    return this.players().filter(p => p.ready).length;
   }
 
   leaveGame(): void {

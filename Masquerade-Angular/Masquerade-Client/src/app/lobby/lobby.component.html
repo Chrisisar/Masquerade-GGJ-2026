@@ -10,7 +10,7 @@
     <div class="players-section">
       <h2>Players</h2>
       <div class="players-list">
-        @for ( player of players; track player.id ) {
+        @for ( player of players(); track player.id ) {
           <div class="player-item" [class.ready]="player.ready" [class.waiting]="!player.ready">
             <span class="player-name">{{ player.name }}</span>
             <span class="player-role">{{ player.role }}</span>
