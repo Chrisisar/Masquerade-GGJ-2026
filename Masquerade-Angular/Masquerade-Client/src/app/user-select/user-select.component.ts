@@ -59,15 +59,8 @@ export class UserSelectComponent {
     if (!this.connected) return;
     const name = (this.newRoomName || '').trim();
     if (!name) return;
-    //const newRoom: GameRoom = {
-    //  id: Date.now().toString(),
-    //  name,
-    //  status: 'open'
-    //};
-    //this.rooms.unshift(newRoom);
-    //this.newRoomName = '';
-    console.log(this.userName + ' created room ' + name);
-    // TODO: call service to create room on server / SignalR
+    this.svc.CreateAndJoinGame(name);
+    this.appState.setState(GameState.LOBBY, "");
   }
 
   reset() {

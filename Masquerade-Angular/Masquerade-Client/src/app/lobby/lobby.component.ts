@@ -27,21 +27,19 @@ export class LobbyComponent implements OnInit {
   private appState = inject(AppStateService);
   private svc = inject(GameHubService);
 
-  constructor(private router: Router) { 
+  constructor(private router: Router) {
+    this.currentPlayerId = this.svc.playerId;
   }
 
   ngOnInit(): void {
-    this.svc.connect(this.currentPlayerId).then(() => {
-      this.svc.onReceivePlayersInTheRoom().subscribe(msg => 
-        this.players.set(msg.map((player, i) => ({ id: player.connectionId, name: player.username, role: 'Mask Maker', ready: player.isReady }))
+    this.svc.onReceivePlayersInTheRoom().subscribe(msg =>
+      this.players.set(msg.map((player, i) => ({ id: player.connectionId, name: player.username, role: 'Mask Maker', ready: player.isReady }))
       ));
-      this.svc.onReceivePhaseChanged().subscribe(([phase, message]) => 
-        setTimeout(() => {
-          this.appState.setState(phase as GameState, message);
-        }, 800)
-      );
-      this.svc.getAllGameIds();  
-    });
+    this.svc.onReceivePhaseChanged().subscribe(([phase, message]) =>
+      setTimeout(() => {
+        this.appState.setState(phase as GameState, message);
+      }, 800)
+    );
   }
 
   toggleReady(): void {

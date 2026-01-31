@@ -1,10 +1,6 @@
 using Masquerade_GGJ_2026.Models;
 using Masquerade_GGJ_2026.Orchestrators;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Masquerade_GGJ_2026.Models.Messages;
 
 namespace Masquerade_GGJ_2026.Hubs
@@ -57,7 +53,7 @@ namespace Masquerade_GGJ_2026.Hubs
                         game.Players.RemoveAll(p => p.Player.ConnectionId == Context.ConnectionId);
                         if (!game.Players.Any())
                         {
-                            game.PhaseDetails.CurrentPhase = RoundPhase.Lobby;
+                            GamesState.Games.Remove(game);
                         }
                     }
                     await _notifier.UserLeft(gameId, Context.ConnectionId, username);
@@ -117,6 +113,21 @@ namespace Masquerade_GGJ_2026.Hubs
             await _notifier.SendPlayersInRoom(game);
         }
 
+        public async Task<string> CreateAndJoinGame(string gameName)
+        {
+            //Create new game
+            var newGame = new Game
+            {
+                GameName = string.IsNullOrWhiteSpace(gameName) ? $"Room {Guid.NewGuid()}" : gameName
+            };
+            GamesState.Games.Add(newGame);
+
+            //Join the newly created game
+            await JoinGame(newGame.GameId.ToString());
+            await GetAllGameIds();
+            return newGame.GameId.ToString();
+        }
+        
         /// <summary>
         /// Allows a connected client to leave a specific game group.
         /// </summary>
