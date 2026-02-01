@@ -97,7 +97,7 @@ namespace Masquerade_GGJ_2026.Hubs
                     var player = (Player) Context.Items["player"];
                     if(game != null && player != null)
                     {
-                        detachPlayerFromGame(player, game);
+                        await detachPlayerFromGame(player, game);
                         await _notifier.UserLeft(gameId, player);
                     }
                 }
@@ -195,14 +195,13 @@ namespace Masquerade_GGJ_2026.Hubs
             var game = GamesState.Games.FirstOrDefault(g => g.GameId == gameIdGuid);
             if (game != null)
             {
-                detachPlayerFromGame(player, game);
+                await detachPlayerFromGame(player, game);
             }
             
         }
 
         public async Task PlayerReady()
         {
-            
             var player = (Player) Context.Items["player"];
             if (!player.lastAttachedGameId.HasValue)
             {
@@ -275,7 +274,7 @@ namespace Masquerade_GGJ_2026.Hubs
             }
         }
 
-        private void detachPlayerFromGame(Player player, Game game)
+        private async Task detachPlayerFromGame(Player player, Game game)
         {
             player.IsRemoved = true;
             if (game.Players.All(p => p.Player.IsRemoved))
@@ -290,7 +289,7 @@ namespace Masquerade_GGJ_2026.Hubs
                 return;
             }
 
-            _notifier.SendPlayersInRoom(game);
+            await _notifier.SendPlayersInRoom(game);
         }
 
     }
