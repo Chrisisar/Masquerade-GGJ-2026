@@ -34,9 +34,8 @@ namespace Masquerade_GGJ_2026.Hubs
             {
                 Player player;
                 
-                if (_players.ContainsKey(userToken))
+                if (_players.TryGetValue(userToken, out player))
                 {
-                    player = _players[userToken];
                     player.ConnectionId = Context.ConnectionId;
                     player.IsRemoved = false;
                     if (player.lastAttachedGameId.HasValue)
