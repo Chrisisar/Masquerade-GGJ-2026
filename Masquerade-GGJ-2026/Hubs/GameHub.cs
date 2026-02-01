@@ -193,7 +193,10 @@ namespace Masquerade_GGJ_2026.Hubs
             
             await _notifier.UserLeft(gameId!, player);
             var game = GamesState.Games.FirstOrDefault(g => g.GameId == gameIdGuid);
-            detachPlayerFromGame(player, game);
+            if (game != null)
+            {
+                detachPlayerFromGame(player, game);
+            }
             
         }
 
