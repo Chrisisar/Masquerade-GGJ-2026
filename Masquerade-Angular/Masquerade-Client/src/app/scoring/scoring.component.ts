@@ -10,7 +10,7 @@ interface ScoringPlayer {
   role: string;
   score: number;
   selectedDifferentMaskId?: string | null;
-  hasReady: boolean;
+  isReady: boolean;
   approved?: boolean; // whether they chose the "different" mask (for demo)
 }
 
@@ -39,7 +39,7 @@ export class ScoringComponent implements OnInit {
     );
 
     this.svc.onReceivePlayersInTheRoom().subscribe(msg => {
-      this.players().forEach(p => p.hasReady = msg.filter(m => m.connectionId == p.id)[0].isReady) 
+      this.players().forEach(p => p.isReady = msg.filter(m => m.connectionId == p.id)[0].isReady) 
       this.scoreboard; }
     );
 
@@ -50,10 +50,9 @@ export class ScoringComponent implements OnInit {
         role: 'Role 1',
         score: p.score,
         selectedDifferentMaskId: p.votedPlayerId,
-        hasReady: p.player.isReady,
+        isReady: p.player.isReady,
         approved: p.votedPlayerId === null ? true : p.votedPlayerId === p.player.connectionId // for demo purposes
         });
-        this.scoreboard
       }
     );
   }

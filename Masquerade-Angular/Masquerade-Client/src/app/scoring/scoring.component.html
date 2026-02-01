@@ -49,9 +49,9 @@
         <h3>Ready Status</h3>
         <ul>
           @for ( p of scoreboard; track p.id) {
-            <li [class.ready]="p.hasReady">
+            <li [class.ready]="p.isReady">
               <span class="name">{{ p.name }}</span>
-              <span class="status">{{ p.hasReady ? 'Ready' : 'Waiting' }}</span>
+              <span class="status">{{ p.isReady ? 'Ready' : 'Waiting' }}</span>
             </li>
           }
         </ul>
