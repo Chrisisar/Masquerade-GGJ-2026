@@ -226,7 +226,6 @@ namespace Masquerade_GGJ_2026.Hubs
                     await _notifier.SendPlayersInRoom(game);
                     _log.LogInformation("Player {Username} in Game {GameId} is ready={ready}", player.Username, gameIdGuid, player.IsReady);
                     // Check if all players are ready
-                    //ToDo: at this step - remove inactive players from the game
                     if (game.Players.All(p => p.Player.IsReady || p.Player.IsRemoved))
                     {
                         if (game.PhaseDetails.CurrentPhase == RoundPhase.Lobby)
