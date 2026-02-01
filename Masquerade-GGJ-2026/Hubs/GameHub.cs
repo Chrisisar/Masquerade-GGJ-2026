@@ -206,7 +206,7 @@ namespace Masquerade_GGJ_2026.Hubs
             var player = (Player) Context.Items["player"];
             if (!player.lastAttachedGameId.HasValue)
             {
-                _log.LogWarning("PlayerReady called with empty gameId}");
+                _log.LogWarning("PlayerReady called with empty gameId");
                 return;
             }
 
